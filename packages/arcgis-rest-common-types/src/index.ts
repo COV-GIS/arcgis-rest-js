@@ -138,12 +138,12 @@ export interface IFont {
  * Portal Item
  */
 export interface IItem {
-  id?: string;
+  id: string;
   owner: string;
-  title: string;
-  type: string;
-  tags: string[];
-  typeKeywords: string[];
+  title?: string;
+  type?: string;
+  tags?: string[];
+  typeKeywords?: string[];
   description?: string;
   snippet?: string;
   documentation?: string;
