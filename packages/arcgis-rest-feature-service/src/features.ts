@@ -2,6 +2,7 @@
  * Apache-2.0 */
 import {
   esriGeometryType,
+  spatialRel,
   IFeature,
   IField,
   IGeometry,
@@ -45,15 +46,7 @@ export interface IQueryFeaturesParams {
   geometryType?: esriGeometryType;
   // NOTE: either WKID or ISpatialReference
   inSR?: string | ISpatialReference;
-  spatialRel?:
-    | "esriSpatialRelIntersects"
-    | "esriSpatialRelContains"
-    | "esriSpatialRelCrosses"
-    | "esriSpatialRelEnvelopeIntersects"
-    | "esriSpatialRelIndexIntersects"
-    | "esriSpatialRelOverlaps"
-    | "esriSpatialRelTouches"
-    | "esriSpatialRelWithin";
+  spatialRel?: spatialRel;
   relationParam?: string;
   // NOTE: either time=1199145600000 or time=1199145600000, 1230768000000
   time?: Date | Date[];
@@ -260,15 +253,7 @@ export interface IDeleteFeaturesParams {
   geometryType?: esriGeometryType;
   // NOTE: either WKID or ISpatialReference
   inSR?: string | ISpatialReference;
-  spatialRel?:
-    | "esriSpatialRelIntersects"
-    | "esriSpatialRelContains"
-    | "esriSpatialRelCrosses"
-    | "esriSpatialRelEnvelopeIntersects"
-    | "esriSpatialRelIndexIntersects"
-    | "esriSpatialRelOverlaps"
-    | "esriSpatialRelTouches"
-    | "esriSpatialRelWithin";
+  spatialRel?: spatialRel;
   gdbVersion?: string;
   returnEditMoment?: boolean;
   rollbackOnFailure?: boolean;

@@ -92,6 +92,19 @@ export type esriGeometryType =
   | "esriGeometryEnvelope";
 
 /**
+ *
+ */
+export type spatialRel =
+  | "esriSpatialRelIntersects"
+  | "esriSpatialRelContains"
+  | "esriSpatialRelCrosses"
+  | "esriSpatialRelEnvelopeIntersects"
+  | "esriSpatialRelIndexIntersects"
+  | "esriSpatialRelOverlaps"
+  | "esriSpatialRelTouches"
+  | "esriSpatialRelWithin";
+
+/**
  * Extents are used to define rectangles and bounding boxes.
  */
 export interface IExtent {
