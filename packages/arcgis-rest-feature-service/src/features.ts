@@ -156,3 +156,157 @@ export function queryFeatures(
   // TODO: do we need to serialize any of the array/object params?
   return request(`${requestOptions.url}/query`, options);
 }
+
+/**
+ * add, update and delete features results
+ */
+export interface IFeaturesResult {
+  objectId?: number;
+  globalId?: string;
+  success?: boolean;
+}
+
+/**
+ * add and update features parameters
+ */
+export interface IAddUpdateFeaturesParams {
+  features?: IFeature[];
+  gdbVersion?: string;
+  returnEditMoment?: boolean;
+  rollbackOnFailure?: boolean;
+}
+
+/**
+ * add features request options
+ *
+ * @param url - layer service url
+ * @param params - query parameters to be sent to the feature service
+ */
+export interface IAddFeaturesRequestOptions extends IRequestOptions {
+  url: string;
+  params?: IAddUpdateFeaturesParams;
+}
+
+/**
+ * add features results
+ */
+export interface IAddFeaturesResult {
+  addResults?: IFeaturesResult[];
+}
+
+/**
+ * Add features
+ *
+ * @param requestOptions - Options for the request
+ * @returns A Promise that will resolve with the query response.
+ */
+export function addFeatures(
+  requestOptions: IAddFeaturesRequestOptions
+): Promise<IAddFeaturesResult> {
+  const url = `${requestOptions.url}/addFeatures`;
+
+  // default to a GET request
+  const options: IAddFeaturesRequestOptions = {
+    ...{ httpMethod: "GET" },
+    ...requestOptions
+  };
+  return request(url, options);
+}
+
+/**
+ * update features request options
+ *
+ * @param url - layer service url
+ * @param params - query parameters to be sent to the feature service
+ */
+export interface IUpdateFeaturesRequestOptions extends IRequestOptions {
+  url: string;
+  params?: IAddUpdateFeaturesParams;
+}
+
+/**
+ * update features results
+ */
+export interface IUpdateFeaturesResult {
+  updateResults?: IFeaturesResult[];
+}
+
+/**
+ * Update features
+ *
+ * @param requestOptions - Options for the request
+ * @returns A Promise that will resolve with the query response.
+ */
+export function updateFeatures(
+  requestOptions: IUpdateFeaturesRequestOptions
+): Promise<IUpdateFeaturesResult> {
+  const url = `${requestOptions.url}/updateFeatures`;
+
+  // default to a GET request
+  const options: IUpdateFeaturesRequestOptions = {
+    ...{ httpMethod: "GET" },
+    ...requestOptions
+  };
+  return request(url, options);
+}
+
+/**
+ * delete features parameters
+ */
+export interface IDeleteFeaturesParams {
+  where?: string;
+  objectIds?: number[];
+  geometry?: IGeometry;
+  geometryType?: esriGeometryType;
+  // NOTE: either WKID or ISpatialReference
+  inSR?: string | ISpatialReference;
+  spatialRel?:
+    | "esriSpatialRelIntersects"
+    | "esriSpatialRelContains"
+    | "esriSpatialRelCrosses"
+    | "esriSpatialRelEnvelopeIntersects"
+    | "esriSpatialRelIndexIntersects"
+    | "esriSpatialRelOverlaps"
+    | "esriSpatialRelTouches"
+    | "esriSpatialRelWithin";
+  gdbVersion?: string;
+  returnEditMoment?: boolean;
+  rollbackOnFailure?: boolean;
+}
+
+/**
+ * delete features request options
+ *
+ * @param url - layer service url
+ * @param params - query parameters to be sent to the feature service
+ */
+export interface IDeleteFeaturesRequestOptions extends IRequestOptions {
+  url: string;
+  params?: IDeleteFeaturesParams;
+}
+
+/**
+ * update features results
+ */
+export interface IDeleteFeaturesResult {
+  deleteResults?: IFeaturesResult[];
+}
+
+/**
+ * Delete features
+ *
+ * @param requestOptions - Options for the request
+ * @returns A Promise that will resolve with the query response.
+ */
+export function deleteFeatures(
+  requestOptions: IDeleteFeaturesRequestOptions
+): Promise<IDeleteFeaturesResult> {
+  const url = `${requestOptions.url}/deleteFeatures`;
+
+  // default to a GET request
+  const options: IDeleteFeaturesRequestOptions = {
+    ...{ httpMethod: "GET" },
+    ...requestOptions
+  };
+  return request(url, options);
+}
