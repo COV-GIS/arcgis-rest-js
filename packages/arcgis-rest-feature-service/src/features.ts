@@ -146,24 +146,23 @@ export function queryFeatures(
   if (!options.params.outFields) {
     options.params.outFields = "*";
   }
-  // TODO: do we need to serialize any of the array/object params?
   return request(`${requestOptions.url}/query`, options);
 }
 
 /**
  * add, update and delete features results
  */
-export interface IFeaturesResult {
+export interface IFeaturesEditResult {
   objectId?: number;
   globalId?: string;
   success?: boolean;
 }
 
 /**
- * add and update features parameters
+ * add and update features update parameters
  */
-export interface IAddUpdateFeaturesParams {
-  features?: IFeature[];
+export interface IAddUpdateFeaturesUpdates {
+  features: IFeature[];
   gdbVersion?: string;
   returnEditMoment?: boolean;
   rollbackOnFailure?: boolean;
@@ -177,14 +176,14 @@ export interface IAddUpdateFeaturesParams {
  */
 export interface IAddFeaturesRequestOptions extends IRequestOptions {
   url: string;
-  params?: IAddUpdateFeaturesParams;
+  updates?: IAddUpdateFeaturesUpdates;
 }
 
 /**
  * add features results
  */
 export interface IAddFeaturesResult {
-  addResults?: IFeaturesResult[];
+  addResults?: IFeaturesEditResult[];
 }
 
 /**
@@ -198,9 +197,9 @@ export function addFeatures(
 ): Promise<IAddFeaturesResult> {
   const url = `${requestOptions.url}/addFeatures`;
 
-  // default to a GET request
+  // edit operations POST only
   const options: IAddFeaturesRequestOptions = {
-    ...{ httpMethod: "GET" },
+    ...{ httpMethod: "POST" },
     ...requestOptions
   };
   return request(url, options);
@@ -214,14 +213,14 @@ export function addFeatures(
  */
 export interface IUpdateFeaturesRequestOptions extends IRequestOptions {
   url: string;
-  params?: IAddUpdateFeaturesParams;
+  updates?: IAddUpdateFeaturesUpdates;
 }
 
 /**
  * update features results
  */
 export interface IUpdateFeaturesResult {
-  updateResults?: IFeaturesResult[];
+  updateResults?: IFeaturesEditResult[];
 }
 
 /**
@@ -235,9 +234,9 @@ export function updateFeatures(
 ): Promise<IUpdateFeaturesResult> {
   const url = `${requestOptions.url}/updateFeatures`;
 
-  // default to a GET request
+  // edit operations POST only
   const options: IUpdateFeaturesRequestOptions = {
-    ...{ httpMethod: "GET" },
+    ...{ httpMethod: "POST" },
     ...requestOptions
   };
   return request(url, options);
@@ -274,7 +273,7 @@ export interface IDeleteFeaturesRequestOptions extends IRequestOptions {
  * update features results
  */
 export interface IDeleteFeaturesResult {
-  deleteResults?: IFeaturesResult[];
+  deleteResults?: IFeaturesEditResult[];
 }
 
 /**
@@ -288,9 +287,9 @@ export function deleteFeatures(
 ): Promise<IDeleteFeaturesResult> {
   const url = `${requestOptions.url}/deleteFeatures`;
 
-  // default to a GET request
+  // edit operations POST only
   const options: IDeleteFeaturesRequestOptions = {
-    ...{ httpMethod: "GET" },
+    ...{ httpMethod: "POST" },
     ...requestOptions
   };
   return request(url, options);
