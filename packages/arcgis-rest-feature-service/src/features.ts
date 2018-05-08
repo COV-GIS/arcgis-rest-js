@@ -153,9 +153,9 @@ export function queryFeatures(
  * add, update and delete features results
  */
 export interface IFeaturesEditResult {
-  objectId?: number;
+  objectId: number;
   globalId?: string;
-  success?: boolean;
+  success: boolean;
 }
 
 /**
