@@ -2,14 +2,14 @@
  * Apache-2.0 */
 import {
   esriGeometryType,
-  spatialRel,
+  SpatialRelationship,
   IFeature,
   IField,
   IGeometry,
   ISpatialReference,
   IFeatureSet
 } from "@esri/arcgis-rest-common-types";
-import { request, IRequestOptions } from "@esri/arcgis-rest-request";
+import { request, IRequestOptions, IParams } from "@esri/arcgis-rest-request";
 
 /**
  * parameters required to get a feature by id
@@ -38,15 +38,14 @@ export interface IStatisticDefinition {
  *
  * See https://developers.arcgis.com/rest/services-reference/query-feature-service-layer-.htm
  */
-export interface IQueryFeaturesParams {
-  // TODO: are _any_ of these required?
+export interface IQueryFeaturesParams extends IParams {
   where?: string;
   objectIds?: number[];
   geometry?: IGeometry;
   geometryType?: esriGeometryType;
   // NOTE: either WKID or ISpatialReference
   inSR?: string | ISpatialReference;
-  spatialRel?: spatialRel;
+  spatialRel?: SpatialRelationship;
   relationParam?: string;
   // NOTE: either time=1199145600000 or time=1199145600000, 1230768000000
   time?: Date | Date[];
@@ -131,8 +130,7 @@ export function getFeature(
 export function queryFeatures(
   requestOptions: IQueryFeaturesRequestOptions
 ): Promise<IQueryFeaturesResponse> {
-  // set default query parameters
-  // and default to a GET request
+  // default to a GET request
   const options: IQueryFeaturesRequestOptions = {
     ...{
       params: {},
@@ -140,6 +138,7 @@ export function queryFeatures(
     },
     ...requestOptions
   };
+  // set default query parameters
   if (!options.params.where) {
     options.params.where = "1=1";
   }
@@ -161,8 +160,7 @@ export interface IFeaturesEditResult {
 /**
  * add and update features update parameters
  */
-export interface IAddUpdateFeaturesUpdates {
-  features: IFeature[];
+export interface ICrudFeaturesParams extends IParams {
   gdbVersion?: string;
   returnEditMoment?: boolean;
   rollbackOnFailure?: boolean;
@@ -176,7 +174,8 @@ export interface IAddUpdateFeaturesUpdates {
  */
 export interface IAddFeaturesRequestOptions extends IRequestOptions {
   url: string;
-  updates?: IAddUpdateFeaturesUpdates;
+  adds: IFeature[];
+  params?: ICrudFeaturesParams;
 }
 
 /**
@@ -190,18 +189,22 @@ export interface IAddFeaturesResult {
  * Add features
  *
  * @param requestOptions - Options for the request
- * @returns A Promise that will resolve with the query response.
+ * @returns A Promise that will resolve with the addFeatures response.
  */
 export function addFeatures(
   requestOptions: IAddFeaturesRequestOptions
 ): Promise<IAddFeaturesResult> {
   const url = `${requestOptions.url}/addFeatures`;
 
-  // edit operations POST only
+  // edit operations are POST only
   const options: IAddFeaturesRequestOptions = {
-    ...{ httpMethod: "POST" },
+    params: {},
     ...requestOptions
   };
+
+  // mixin, don't overwrite
+  options.params.features = requestOptions.adds;
+
   return request(url, options);
 }
 
@@ -213,7 +216,8 @@ export function addFeatures(
  */
 export interface IUpdateFeaturesRequestOptions extends IRequestOptions {
   url: string;
-  updates?: IAddUpdateFeaturesUpdates;
+  updates: IFeature[];
+  params?: ICrudFeaturesParams;
 }
 
 /**
@@ -227,35 +231,35 @@ export interface IUpdateFeaturesResult {
  * Update features
  *
  * @param requestOptions - Options for the request
- * @returns A Promise that will resolve with the query response.
+ * @returns A Promise that will resolve with the updateFeatures response.
  */
 export function updateFeatures(
   requestOptions: IUpdateFeaturesRequestOptions
 ): Promise<IUpdateFeaturesResult> {
   const url = `${requestOptions.url}/updateFeatures`;
 
-  // edit operations POST only
+  // edit operations are POST only
   const options: IUpdateFeaturesRequestOptions = {
-    ...{ httpMethod: "POST" },
+    params: {},
     ...requestOptions
   };
+
+  // mixin, don't overwrite
+  options.params.features = requestOptions.updates;
+
   return request(url, options);
 }
 
 /**
  * delete features parameters
  */
-export interface IDeleteFeaturesParams {
+export interface IDeleteFeaturesParams extends ICrudFeaturesParams {
   where?: string;
-  objectIds?: number[];
   geometry?: IGeometry;
   geometryType?: esriGeometryType;
   // NOTE: either WKID or ISpatialReference
   inSR?: string | ISpatialReference;
-  spatialRel?: spatialRel;
-  gdbVersion?: string;
-  returnEditMoment?: boolean;
-  rollbackOnFailure?: boolean;
+  spatialRel?: SpatialRelationship;
 }
 
 /**
@@ -266,6 +270,7 @@ export interface IDeleteFeaturesParams {
  */
 export interface IDeleteFeaturesRequestOptions extends IRequestOptions {
   url: string;
+  objectIds: number[];
   params?: IDeleteFeaturesParams;
 }
 
@@ -279,8 +284,8 @@ export interface IDeleteFeaturesResult {
 /**
  * Delete features
  *
- * @param requestOptions - Options for the request
- * @returns A Promise that will resolve with the query response.
+ * @param deleteFeaturesRequestOptions - Options for the request
+ * @returns A Promise that will resolve with the deleteFeatures response.
  */
 export function deleteFeatures(
   requestOptions: IDeleteFeaturesRequestOptions
@@ -289,8 +294,12 @@ export function deleteFeatures(
 
   // edit operations POST only
   const options: IDeleteFeaturesRequestOptions = {
-    ...{ httpMethod: "POST" },
+    params: {},
     ...requestOptions
   };
+
+  // mixin, don't overwrite
+  options.params.objectIds = requestOptions.objectIds;
+
   return request(url, options);
 }

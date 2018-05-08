@@ -84,7 +84,7 @@ export interface IEnvelope extends IGeometry {
 /**
  *
  */
-export type esriGeometryType =
+export type esriGeometryType =  // why is this type camelCased?
   | "esriGeometryPoint"
   | "esriGeometryMultipoint"
   | "esriGeometryPolyline"
@@ -92,9 +92,9 @@ export type esriGeometryType =
   | "esriGeometryEnvelope";
 
 /**
- *
+ * The spatial relationship used to compare input geometries
  */
-export type spatialRel =
+export type SpatialRelationship =
   | "esriSpatialRelIntersects"
   | "esriSpatialRelContains"
   | "esriSpatialRelCrosses"
