@@ -270,7 +270,7 @@ export interface IDeleteFeaturesParams extends ICrudFeaturesParams {
  */
 export interface IDeleteFeaturesRequestOptions extends IRequestOptions {
   url: string;
-  objectIds: number[];
+  deletes: number[];
   params?: IDeleteFeaturesParams;
 }
 
@@ -299,7 +299,7 @@ export function deleteFeatures(
   };
 
   // mixin, don't overwrite
-  options.params.objectIds = requestOptions.objectIds;
+  options.params.objectIds = requestOptions.deletes;
 
   return request(url, options);
 }

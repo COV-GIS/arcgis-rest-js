@@ -160,7 +160,7 @@ describe("feature", () => {
     const requestOptions = {
       url:
         "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0",
-      objectIds: [1001],
+      deletes: [1001],
       params: {
         where: "1=1"
       }
@@ -174,7 +174,7 @@ describe("feature", () => {
       expect(options.body).toContain("where=1%3D1");
       expect(options.method).toBe("POST");
       expect(deleteFeaturesResponse.deleteResults[0].objectId).toEqual(
-        requestOptions.objectIds[0]
+        requestOptions.deletes[0]
       );
       expect(deleteFeaturesResponse.deleteResults[0].success).toEqual(true);
       done();
