@@ -151,7 +151,7 @@ export function queryFeatures(
 /**
  * add, update and delete features results
  */
-export interface IFeaturesEditResult {
+export interface IEditFeatureResult {
   objectId: number;
   globalId?: string;
   success: boolean;
@@ -160,7 +160,7 @@ export interface IFeaturesEditResult {
 /**
  * add and update features update parameters
  */
-export interface ICrudFeaturesParams extends IParams {
+export interface IEditFeaturesParams extends IParams {
   gdbVersion?: string;
   returnEditMoment?: boolean;
   rollbackOnFailure?: boolean;
@@ -175,14 +175,14 @@ export interface ICrudFeaturesParams extends IParams {
 export interface IAddFeaturesRequestOptions extends IRequestOptions {
   url: string;
   adds: IFeature[];
-  params?: ICrudFeaturesParams;
+  params?: IEditFeaturesParams;
 }
 
 /**
  * add features results
  */
 export interface IAddFeaturesResult {
-  addResults?: IFeaturesEditResult[];
+  addResults?: IEditFeatureResult[];
 }
 
 /**
@@ -217,14 +217,14 @@ export function addFeatures(
 export interface IUpdateFeaturesRequestOptions extends IRequestOptions {
   url: string;
   updates: IFeature[];
-  params?: ICrudFeaturesParams;
+  params?: IEditFeaturesParams;
 }
 
 /**
  * update features results
  */
 export interface IUpdateFeaturesResult {
-  updateResults?: IFeaturesEditResult[];
+  updateResults?: IEditFeatureResult[];
 }
 
 /**
@@ -253,7 +253,7 @@ export function updateFeatures(
 /**
  * delete features parameters
  */
-export interface IDeleteFeaturesParams extends ICrudFeaturesParams {
+export interface IDeleteFeaturesParams extends IEditFeaturesParams {
   where?: string;
   geometry?: IGeometry;
   geometryType?: esriGeometryType;
@@ -278,7 +278,7 @@ export interface IDeleteFeaturesRequestOptions extends IRequestOptions {
  * update features results
  */
 export interface IDeleteFeaturesResult {
-  deleteResults?: IFeaturesEditResult[];
+  deleteResults?: IEditFeatureResult[];
 }
 
 /**
