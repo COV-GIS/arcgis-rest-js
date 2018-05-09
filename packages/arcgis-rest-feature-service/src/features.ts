@@ -33,19 +33,23 @@ export interface IStatisticDefinition {
   outStatisticFieldName: string;
 }
 
-/**
- * feature query parameters
- *
- * See https://developers.arcgis.com/rest/services-reference/query-feature-service-layer-.htm
- */
-export interface IQueryFeaturesParams extends IParams {
+export interface ISharedQueryParams extends IParams {
   where?: string;
-  objectIds?: number[];
   geometry?: IGeometry;
   geometryType?: esriGeometryType;
   // NOTE: either WKID or ISpatialReference
   inSR?: string | ISpatialReference;
   spatialRel?: SpatialRelationship;
+}
+
+/**
+ * feature query parameters
+ *
+ * See https://developers.arcgis.com/rest/services-reference/query-feature-service-layer-.htm
+ */
+export interface IQueryFeaturesParams extends ISharedQueryParams {
+  objectIds?: number[];
+  // NOTE: either WKID or ISpatialReference
   relationParam?: string;
   // NOTE: either time=1199145600000 or time=1199145600000, 1230768000000
   time?: Date | Date[];
@@ -253,14 +257,9 @@ export function updateFeatures(
 /**
  * delete features parameters
  */
-export interface IDeleteFeaturesParams extends IEditFeaturesParams {
-  where?: string;
-  geometry?: IGeometry;
-  geometryType?: esriGeometryType;
-  // NOTE: either WKID or ISpatialReference
-  inSR?: string | ISpatialReference;
-  spatialRel?: SpatialRelationship;
-}
+export interface IDeleteFeaturesParams
+  extends IEditFeaturesParams,
+    ISharedQueryParams {}
 
 /**
  * delete features request options
