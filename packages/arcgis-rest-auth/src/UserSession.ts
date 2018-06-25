@@ -308,7 +308,7 @@ export class UserSession implements IAuthenticationManager {
       locale
     }: IOauth2Options = {
       ...{
-        portal: "https://arcgis.com/sharing/rest",
+        portal: "https://www.arcgis.com/sharing/rest",
         duration: 20160,
         popup: true,
         state: options.clientId,
@@ -371,7 +371,7 @@ export class UserSession implements IAuthenticationManager {
   /* istanbul ignore next */
   static completeOAuth2(options: IOauth2Options, win: any = window) {
     const { portal, clientId }: IOauth2Options = {
-      ...{ portal: "https://arcgis.com/sharing/rest" },
+      ...{ portal: "https://www.arcgis.com/sharing/rest" },
       ...options
     };
 
@@ -520,8 +520,37 @@ export class UserSession implements IAuthenticationManager {
     });
   }
 
-  // returns authentication in a format useable in the [ArcGIS API for JavaScript](https://developers.arcgis.com/javascript/)
-  getCredential(): ICredential {
+  /**
+   * Translates authentication from the format used in the [ArcGIS API for JavaScript](https://developers.arcgis.com/javascript/).
+   *
+   * ```js
+   * UserSession.fromCredential({
+   *   userId: "jsmith",
+   *   token: "secret"
+   * });
+   * ```
+   *
+   * @returns UserSession
+   */
+  static fromCredential(credential: ICredential) {
+    return new UserSession({
+      portal: credential.server + `/sharing/rest`,
+      token: credential.token,
+      username: credential.userId,
+      tokenExpires: new Date(credential.expires)
+    });
+  }
+
+  /**
+   * Returns authentication in a format useable in the [ArcGIS API for JavaScript](https://developers.arcgis.com/javascript/).
+   *
+   * ```js
+   * esriId.registerToken(session.toCredential());
+   * ```
+   *
+   * @returns ICredential
+   */
+  toCredential(): ICredential {
     return {
       expires: this.tokenExpires.getTime(),
       server: this.portal,
@@ -637,10 +666,15 @@ export class UserSession implements IAuthenticationManager {
       })
       .then(owningSystemUrl => {
         /**
-         * if this server is not owned by this portal bail out with an error
-         * since we know we wont be able to generate a token
+         * if this server is not owned by this portal or the stand-alone
+         * instance of ArcGIS Server doesn't advertise federation,
+         * bail out with an error since we know we wont
+         * be able to generate a token
          */
-        if (!new RegExp(owningSystemUrl).test(this.portal)) {
+        if (
+          !owningSystemUrl ||
+          !new RegExp(owningSystemUrl).test(this.portal)
+        ) {
           throw new ArcGISAuthError(
             `${url} is not federated with ${this.portal}.`,
             "NOT_FEDERATED"

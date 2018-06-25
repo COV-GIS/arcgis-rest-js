@@ -263,6 +263,37 @@ describe("UserSession", () => {
           done();
         });
     });
+
+    it("should throw an ArcGISAuthError when no owning system is advertised", done => {
+      const session = new UserSession({
+        clientId: "id",
+        token: "token",
+        refreshToken: "refresh",
+        tokenExpires: YESTERDAY
+      });
+
+      fetchMock.post("https://gisservices.city.gov/public/rest/info", {
+        currentVersion: 10.51,
+        fullVersion: "10.5.1.120",
+        authInfo: {
+          isTokenBasedSecurity: true,
+          tokenServicesUrl: "https://gis.city.gov/sharing/generateToken"
+        }
+      });
+
+      session
+        .getToken(
+          "https://gisservices.city.gov/public/rest/services/trees/FeatureServer/0/query"
+        )
+        .catch(e => {
+          expect(e.name).toEqual(ErrorTypes.ArcGISAuthError);
+          expect(e.code).toEqual("NOT_FEDERATED");
+          expect(e.message).toEqual(
+            "NOT_FEDERATED: https://gisservices.city.gov/public/rest/services/trees/FeatureServer/0/query is not federated with https://www.arcgis.com/sharing/rest."
+          );
+          done();
+        });
+    });
   });
 
   describe(".refreshSession()", () => {
@@ -425,7 +456,7 @@ describe("UserSession", () => {
         });
 
       expect(MockWindow.open).toHaveBeenCalledWith(
-        "https://arcgis.com/sharing/rest/oauth2/authorize?client_id=clientId123&response_type=token&expiration=20160&redirect_uri=http%3A%2F%2Fexample-app.com%2Fredirect&state=abc123&locale=",
+        "https://www.arcgis.com/sharing/rest/oauth2/authorize?client_id=clientId123&response_type=token&expiration=20160&redirect_uri=http%3A%2F%2Fexample-app.com%2Fredirect&state=abc123&locale=",
         "oauth-window",
         "height=400,width=600,menubar=no,location=yes,resizable=yes,scrollbars=yes,status=yes"
       );
@@ -457,7 +488,7 @@ describe("UserSession", () => {
       });
 
       expect(MockWindow.open).toHaveBeenCalledWith(
-        "https://arcgis.com/sharing/rest/oauth2/authorize?client_id=clientId123&response_type=token&expiration=20160&redirect_uri=http%3A%2F%2Fexample-app.com%2Fredirect&state=clientId123&locale=fr",
+        "https://www.arcgis.com/sharing/rest/oauth2/authorize?client_id=clientId123&response_type=token&expiration=20160&redirect_uri=http%3A%2F%2Fexample-app.com%2Fredirect&state=clientId123&locale=fr",
         "oauth-window",
         "height=400,width=600,menubar=no,location=yes,resizable=yes,scrollbars=yes,status=yes"
       );
@@ -488,7 +519,7 @@ describe("UserSession", () => {
       );
 
       expect(MockWindow.location.href).toBe(
-        "https://arcgis.com/sharing/rest/oauth2/authorize?client_id=clientId123&response_type=token&expiration=20160&redirect_uri=http%3A%2F%2Fexample-app.com%2Fredirect&state=clientId123&locale="
+        "https://www.arcgis.com/sharing/rest/oauth2/authorize?client_id=clientId123&response_type=token&expiration=20160&redirect_uri=http%3A%2F%2Fexample-app.com%2Fredirect&state=clientId123&locale="
       );
     });
   });
@@ -704,16 +735,16 @@ describe("UserSession", () => {
     });
   });
 
-  describe(".getCredential()", () => {
+  describe("to/fromCredential()", () => {
     const MOCK_CREDENTIAL: ICredential = {
       expires: TOMORROW.getTime(),
-      server: "https://www.arcgis.com/sharing/rest",
+      server: "https://www.arcgis.com",
       ssl: true,
       token: "token",
       userId: "jsmith"
     };
 
-    it("should cache metadata about the user", () => {
+    it("should create a credential object from a session", () => {
       const session = new UserSession({
         clientId: "clientId",
         redirectUri: "https://example-app.com/redirect-uri",
@@ -726,8 +757,20 @@ describe("UserSession", () => {
         password: "123456"
       });
 
-      const creds = session.getCredential();
-      expect(creds).toEqual(MOCK_CREDENTIAL);
+      const creds = session.toCredential();
+      expect(creds.userId).toEqual("jsmith");
+      expect(creds.server).toEqual("https://www.arcgis.com/sharing/rest");
+      expect(creds.ssl).toEqual(true);
+      expect(creds.token).toEqual("token");
+      expect(creds.expires).toEqual(TOMORROW.getTime());
+    });
+
+    it("should create a UserSession from a credential", () => {
+      const session = UserSession.fromCredential(MOCK_CREDENTIAL);
+      expect(session.username).toEqual("jsmith");
+      expect(session.portal).toEqual("https://www.arcgis.com/sharing/rest");
+      expect(session.token).toEqual("token");
+      expect(session.tokenExpires).toEqual(new Date(TOMORROW));
     });
   });
 });
