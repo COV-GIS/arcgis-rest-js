@@ -38,14 +38,14 @@ export interface IGetAttachmentsResponse {
 }
 
 /**
- * Request `attachmentInfos` of a feature by id. See the [Attachment Infos](https://developers.arcgis.com/rest/services-reference/attachment-infos-feature-service-.htm) documentation for more information.
+ * Request `attachmentInfos` of a feature by id. See [Attachment Infos](https://developers.arcgis.com/rest/services-reference/attachment-infos-feature-service-.htm) for more information.
  *
  * ```js
  * import { getAttachments } from '@esri/arcgis-rest-feature-service';
  *
  * getAttachments({
  *   url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/ServiceRequest/FeatureServer/0",
- *   objectId: 8484
+ *   id: 8484
  * });
  * ```
  *
