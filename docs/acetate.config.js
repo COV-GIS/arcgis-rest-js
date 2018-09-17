@@ -3,6 +3,7 @@ const fs = require("fs");
 const { inspect } = require("util");
 const _ = require("lodash");
 const slug = require("slug");
+const sriToolbox = require("sri-toolbox");
 
 const IS_DEV = process.env.ENV !== "prod";
 const BASE_URL = process.env.ENV === "prod" ? "/arcgis-rest-js" : "";
@@ -194,6 +195,29 @@ module.exports = function(acetate) {
    */
   acetate.filter("inspect", function(obj) {
     return inspect(obj, { depth: 3 });
+  });
+
+  acetate.helper("scriptTag", function(context, package) {
+    /********************************/
+    let integrity;
+    // path to min file
+    const filePath = `./packages/${package.name.replace("@esri", "")}/dist/umd/${package.name.replace("@esri/arcgis-rest-", "")}.umd.min.js`;
+    // read file
+    fs.readFile(filePath, (err, data) => {
+      if (data) {
+        // generate sha384 SRI hash
+        integrity = sriToolbox.generate({
+          algorithms: ["sha384"]
+        }, data);
+        console.log(integrity);
+      } else if (err) {
+        console.log(err);
+      }
+    });
+    // return `&lt;script src="https://unpkg.com/${package.name}@${package.version}/dist/umd/${package.name.replace("@esri/arcgis-rest-", "")}.umd.min.js" integrity="${integrity}" crossorigin="anonymous"&gt;&lt;/script&gt;`;
+    /********************************/
+
+    return `&lt;script src="https://unpkg.com/${package.name}@${package.version}/dist/umd/${package.name.replace("@esri/arcgis-rest-", "")}.umd.min.js"&gt;&lt;/script&gt;`;
   });
 
   // without the '.js' on the end, for the benefit of the AMD sample
